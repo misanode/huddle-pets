@@ -12,7 +12,7 @@ const looks: Record<Activity, { face: string; label: string }> = {
   error: { face: '💥', label: 'Hit an error' },
 }
 
-export function PetCard({ member, updatedAt, isMe }: { member: Member; updatedAt: string; isMe: boolean }) {
+export function PetCard({ member, updatedAt, isMe = false }: { member: Pick<Member, 'name' | 'activity' | 'tool'>; updatedAt: string; isMe?: boolean }) {
   const look = looks[member.activity] ?? looks.idle
 
   return (
