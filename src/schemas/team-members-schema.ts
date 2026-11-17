@@ -26,3 +26,5 @@ export const teamMembersSchema: CollectionSchema = {
   uniqueOn: ['teamId', 'userId'],
   permissions: { member: access, admin: access },
 }
+
+export type Member = { teamId: string; userId?: string; name: string; activity: Activity; tool: string }

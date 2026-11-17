@@ -12,3 +12,5 @@ export const roomsSchema: CollectionSchema = {
   uniqueOn: ['teamId'],
   permissions: { member: access, admin: access },
 }
+
+export type Room = { teamId: string; name: string }
