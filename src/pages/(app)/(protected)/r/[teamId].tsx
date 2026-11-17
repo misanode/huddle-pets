@@ -5,6 +5,7 @@ import { Button, useToast } from '@/components/ui'
 import type { Room } from '../../../../schemas/rooms-schema'
 import { ACTIVITIES, type Member } from '../../../../schemas/team-members-schema'
 import { PetCard } from '../../../../components/PetCard'
+import { ConnectAgent } from '../../../../components/ConnectAgent'
 
 const sampleTools: Partial<Record<Member['activity'], string>> = {
   reading: 'Read',
@@ -74,7 +75,8 @@ function Room({ teamId }: { teamId: string }) {
     <div className="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-xl font-semibold">{rooms[0]?.data.name ?? 'Room'}</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <ConnectAgent teamId={teamId} />
           <Button variant="outline" onClick={copyLink}>
             Copy invite link
           </Button>
