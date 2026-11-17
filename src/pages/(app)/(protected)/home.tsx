@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDisplayName, useMutations, useQuery } from 'deepspace'
 import { Button, Input, useToast } from '@/components/ui'
@@ -15,7 +15,7 @@ export default function HomePage() {
   const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
 
-  const submit = async (event: FormEvent) => {
+  const submit = async (event: SubmitEvent) => {
     event.preventDefault()
     setBusy(true)
     const teamId = crypto.randomUUID()
