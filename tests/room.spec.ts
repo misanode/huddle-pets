@@ -99,7 +99,8 @@ test('renaming yourself updates your pet in every room, live for teammates', asy
   await expect(a.page.getByTestId('pet-card').filter({ hasText: '(you)' })).toContainText(newName, { timeout: 15_000 })
   const aOnB = b.page.getByTestId('pet-card').filter({ hasNotText: '(you)' })
   await expect(aOnB).toContainText(newName, { timeout: 15_000 })
-  await expect(aOnB.getByTestId('pet-clock')).toHaveText(/(AM|PM) \S+ · Austin$/)
+  await expect(aOnB.getByTestId('pet-clock')).toHaveText(/(AM|PM) \S+$/)
+  await expect(aOnB.getByTestId('pet-city')).toHaveText('Austin')
   await a.page.goto(second)
   await expect(a.page.getByTestId('pet-card').filter({ hasText: '(you)' })).toContainText(newName, { timeout: 15_000 })
 
