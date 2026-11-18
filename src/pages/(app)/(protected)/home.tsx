@@ -1,13 +1,15 @@
 import { useState, type SubmitEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth, useMutations, useQuery } from 'deepspace'
-import { Button, ConfirmModal, Input, useToast } from '@/components/ui'
+import { Button, ConfirmModal, Input, SearchInput, useToast } from '@/components/ui'
 import { callAction } from '@/lib/actions'
 import { PageHeader } from '@/components/PageHeader'
 import { useMyProfile } from '@/lib/display-name'
 import { localTimeZone } from '@/lib/time-zone'
 import type { Room } from '../../../schemas/rooms-schema'
 import type { Member } from '../../../schemas/team-members-schema'
+
+const fold = (text: string) => text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase()
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -21,6 +23,9 @@ export default function HomePage() {
   const [busy, setBusy] = useState(false)
   const [deleting, setDeleting] = useState<{ teamId: string; name: string }>()
   const [deletingBusy, setDeletingBusy] = useState(false)
+  const [query, setQuery] = useState('')
+  const needle = fold(query.trim())
+  const shown = needle ? rooms.filter((room) => fold(room.data.name).includes(needle)) : rooms
 
   const deleteRoom = async () => {
     if (!deleting) return
@@ -59,7 +64,13 @@ export default function HomePage() {
         {status === 'ready' && rooms.length === 0 && (
           <p className="text-center text-sm font-light text-muted-foreground">No rooms yet. Create one, or open a room link from a teammate.</p>
         )}
-        {rooms.map((room) => (
+        {rooms.length > 0 && (
+          <SearchInput value={query} onChange={(e) => setQuery(e.target.value)} onClear={() => setQuery('')} placeholder="Search your rooms" aria-label="Search your rooms" />
+        )}
+        {rooms.length > 0 && shown.length === 0 && (
+          <p className="text-center text-sm font-light text-muted-foreground">No rooms match “{query.trim()}”.</p>
+        )}
+        {shown.map((room) => (
           <div key={room.recordId} data-testid="room-row" className="surface flex items-center rounded-2xl transition hover:brightness-125">
             <Link to={`/r/${room.data.teamId}`} className="min-w-0 flex-1 truncate px-5 py-4 text-base font-medium">
               {room.data.name}
