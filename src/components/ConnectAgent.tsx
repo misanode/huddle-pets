@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { Button, Modal, useToast } from '@/components/ui'
 import { callAction } from '@/lib/actions'
 
+const WINDOWS_DIR = '$HOME\\.huddle-pets'
+const WINDOWS_HOOK = `${WINDOWS_DIR}\\hook.mjs`
+
 export function ConnectAgent({ teamId }: { teamId: string }) {
   const [key, setKey] = useState<string>()
   const [busy, setBusy] = useState(false)
@@ -17,7 +20,7 @@ export function ConnectAgent({ teamId }: { teamId: string }) {
 
   const installCommands = !key ? [] : [
     { label: 'macOS / Linux', command: `curl -fsSL --create-dirs -o ~/.huddle-pets/hook.mjs ${location.origin}/hook.mjs && node ~/.huddle-pets/hook.mjs install ${location.origin} ${key}` },
-    { label: 'Windows (PowerShell)', command: `mkdir -Force ~\\.huddle-pets | Out-Null; curl.exe -fsSL -o ~\\.huddle-pets\\hook.mjs ${location.origin}/hook.mjs; node ~\\.huddle-pets\\hook.mjs install ${location.origin} ${key}` },
+    { label: 'Windows (PowerShell)', command: `mkdir -Force "${WINDOWS_DIR}" | Out-Null; curl.exe -fsSL -o "${WINDOWS_HOOK}" ${location.origin}/hook.mjs; if ($LASTEXITCODE -eq 0) { node "${WINDOWS_HOOK}" install ${location.origin} ${key} }` },
   ]
 
   const copy = async (text: string) => {
@@ -62,10 +65,12 @@ export function ConnectAgent({ teamId }: { teamId: string }) {
           <p>Only the event name and tool name are sent, never your files, commands or prompts.</p>
           <p>Keep the key private: anyone with it can change your pet. Clicking "Connect my agent" again makes a new key and turns this one off.</p>
           <p>
-            Installed the other agent later? Run <code>node ~/.huddle-pets/hook.mjs install</code> to connect it with the same key.
+            Installed the other agent later? Run <code>node ~/.huddle-pets/hook.mjs install</code> on Mac, or <code>node "{WINDOWS_HOOK}" install</code> in
+            PowerShell, to connect it with the same key.
           </p>
           <p>
-            To remove the hook from both agents: <code>node ~/.huddle-pets/hook.mjs uninstall</code>
+            To remove the hook from both agents: <code>node ~/.huddle-pets/hook.mjs uninstall</code> on Mac, or <code>node "{WINDOWS_HOOK}" uninstall</code> in
+            PowerShell.
           </p>
         </div>
       </Modal>
