@@ -52,7 +52,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-8 px-4 py-12">
+    <div className="mx-auto flex max-w-xl flex-col gap-8 px-4 py-6 sm:py-12">
       <PageHeader title="Your rooms" subtitle="Each room shows your teammates' pets, live." />
       <form onSubmit={submit} className="surface flex gap-2 rounded-2xl p-2">
         <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Room name" required />

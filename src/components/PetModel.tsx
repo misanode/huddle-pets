@@ -107,11 +107,11 @@ export function PetModel({ clip: wanted, label, fallback }: { clip: string; labe
     }
   }, [enabled])
 
-  if (!enabled) return <div className="flex h-32 w-full items-center justify-center">{fallback}</div>
+  if (!enabled) return <div className="flex h-28 sm:h-32 w-full items-center justify-center">{fallback}</div>
   const clip = !clips || clips.includes(wanted) ? wanted : 'idle'
 
   return (
-    <div className="relative h-32 w-full">
+    <div className="relative h-28 sm:h-32 w-full">
       {!clips && <div className="absolute inset-0 flex items-center justify-center">{fallback}</div>}
       <model-viewer
         ref={ref}
@@ -126,7 +126,7 @@ export function PetModel({ clip: wanted, label, fallback }: { clip: string; labe
         field-of-view="30deg"
         interaction-prompt="none"
         shadow-intensity={0.6}
-        className="block h-32 w-full"
+        className="block h-28 sm:h-32 w-full"
       />
     </div>
   )
