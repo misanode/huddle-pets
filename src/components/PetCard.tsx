@@ -1,19 +1,7 @@
-import type { Activity, Member } from '../schemas/team-members-schema'
+import type { Member } from '../schemas/team-members-schema'
 import { PetModel, usePetClip } from './PetModel'
 import { useNow, zoneClock } from '@/lib/time-zone'
 import { Button } from './ui'
-
-const faces: Record<Activity, string> = {
-  idle: '😴',
-  thinking: '🤔',
-  reading: '📖',
-  searching: '🔍',
-  editing: '✏️',
-  command: '⚙️',
-  waiting: '✅',
-  permission: '✋',
-  error: '💥',
-}
 
 const phrases: Record<string, string> = {
   idle: 'Just hanging out.',
@@ -73,11 +61,6 @@ export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
       <PetModel
         clip={clip}
         label={`${member.name}'s pet: ${phrase}`}
-        fallback={
-          <span className="text-5xl" aria-hidden>
-            {faces[member.activity] ?? faces.idle}
-          </span>
-        }
       />
       <span className="w-full truncate text-sm font-semibold sm:text-base">
         {member.name}

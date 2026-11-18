@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type HTMLAttributes, type ReactNode, type Ref } from 'react'
+import { useEffect, useRef, useState, type HTMLAttributes, type Ref } from 'react'
 import type { ModelViewerElement } from '@google/model-viewer'
 import type { Activity } from '../schemas/team-members-schema'
 
@@ -84,21 +84,39 @@ export function usePetClip(activity: Activity) {
 let modelViewer: Promise<unknown> | undefined
 const loadModelViewer = () => (modelViewer ??= import('@google/model-viewer'))
 
-export function PetModel({ clip: wanted, label, fallback }: { clip: string; label: string; fallback: ReactNode }) {
+function PetPlaceholder({ loading }: { loading: boolean }) {
+  return (
+    <img
+      src="/brand/pet-icon.svg"
+      alt=""
+      width={255}
+      height={181}
+      data-testid="pet-placeholder"
+      data-loading={loading}
+      className={`h-auto w-16 opacity-25 sm:w-20 ${loading ? 'motion-safe:animate-pulse' : ''}`}
+    />
+  )
+}
+
+export function PetModel({ clip: wanted, label }: { clip: string; label: string }) {
   const ref = useRef<ModelViewerElement>(null)
   const [enabled, setEnabled] = useState(false)
+  const [failed, setFailed] = useState(false)
   const [clips, setClips] = useState<string[]>()
   const reducedMotion = prefersReducedMotion()
 
   useEffect(() => {
-    loadModelViewer().then(() => setEnabled(true), () => {})
+    loadModelViewer().then(() => setEnabled(true), () => setFailed(true))
   }, [])
 
   useEffect(() => {
     const viewer = ref.current
     if (!viewer) return
     const onLoad = () => setClips(viewer.availableAnimations)
-    const onError = () => setEnabled(false)
+    const onError = () => {
+      setEnabled(false)
+      setFailed(true)
+    }
     viewer.addEventListener('load', onLoad)
     viewer.addEventListener('error', onError)
     return () => {
@@ -107,12 +125,21 @@ export function PetModel({ clip: wanted, label, fallback }: { clip: string; labe
     }
   }, [enabled])
 
-  if (!enabled) return <div className="flex h-28 sm:h-32 w-full items-center justify-center">{fallback}</div>
+  if (!enabled)
+    return (
+      <div className="flex h-28 w-full items-center justify-center sm:h-32">
+        <PetPlaceholder loading={!failed} />
+      </div>
+    )
   const clip = !clips || clips.includes(wanted) ? wanted : 'idle'
 
   return (
     <div className="relative h-28 sm:h-32 w-full">
-      {!clips && <div className="absolute inset-0 flex items-center justify-center">{fallback}</div>}
+      {!clips && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <PetPlaceholder loading />
+        </div>
+      )}
       <model-viewer
         ref={ref}
         src="/pets/pet.glb"
