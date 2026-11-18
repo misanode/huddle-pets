@@ -1,5 +1,6 @@
 import type { Activity, Member } from '../schemas/team-members-schema'
 import { PetModel, usePetClip } from './PetModel'
+import { useNow, zoneClock } from '@/lib/time-zone'
 import { Button } from './ui'
 
 const faces: Record<Activity, string> = {
@@ -38,11 +39,13 @@ const phrases: Record<string, string> = {
 }
 
 type CardAction = { label: string; ariaLabel: string; onClick: () => void }
-type Props = { member: Pick<Member, 'name' | 'activity' | 'tool'>; updatedAt: string; isMe?: boolean; action?: CardAction }
+type Props = { member: Pick<Member, 'name' | 'activity' | 'tool' | 'timeZone' | 'city'>; updatedAt: string; isMe?: boolean; action?: CardAction }
 
 export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
   const clip = usePetClip(member.activity)
   const phrase = phrases[clip] ?? phrases.idle
+  const clock = zoneClock(member.timeZone, useNow())
+  const updated = new Date(updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
   return (
     <li data-testid="pet-card" data-activity={member.activity} className="relative flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center">
@@ -68,9 +71,18 @@ export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
         {phrase}
       </span>
       {member.tool && <span className="rounded bg-secondary px-2 py-0.5 font-mono text-xs">{member.tool}</span>}
-      <time className="text-xs text-muted-foreground" dateTime={updatedAt}>
-        {new Date(updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
-      </time>
+      {clock ? (
+        <span data-testid="pet-clock" className="text-xs text-muted-foreground" title={`Last update ${updated} your time`}>
+          <span className="whitespace-nowrap">
+            <span aria-hidden>{clock.night ? '🌙' : '☀️'}</span> {clock.time}
+          </span>
+          {member.city && <span className="whitespace-nowrap"> · {member.city}</span>}
+        </span>
+      ) : (
+        <time className="text-xs text-muted-foreground" dateTime={updatedAt}>
+          {updated}
+        </time>
+      )}
     </li>
   )
 }

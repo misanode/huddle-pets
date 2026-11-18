@@ -8,7 +8,7 @@ const access: RolePermissions = {
   create: true,
   update: 'own',
   delete: 'own',
-  writableFields: ['teamId', 'name', 'activity', 'tool'],
+  writableFields: ['teamId', 'name', 'activity', 'tool', 'timeZone', 'city'],
 }
 
 export const teamMembersSchema: CollectionSchema = {
@@ -20,6 +20,8 @@ export const teamMembersSchema: CollectionSchema = {
     { name: 'name', storage: 'text', interpretation: 'plain', required: true, maxLength: 40 },
     { name: 'activity', storage: 'text', interpretation: { kind: 'select', options: [...ACTIVITIES] }, default: 'idle' },
     { name: 'tool', storage: 'text', interpretation: 'plain', default: '', maxLength: 64 },
+    { name: 'timeZone', storage: 'text', interpretation: 'plain', default: '', maxLength: 64 },
+    { name: 'city', storage: 'text', interpretation: 'plain', default: '', maxLength: 40 },
   ],
   teamField: 'teamId',
   ownerField: 'userId',
@@ -27,4 +29,4 @@ export const teamMembersSchema: CollectionSchema = {
   permissions: { member: access, admin: access },
 }
 
-export type Member = { teamId: string; userId?: string; status?: 'active' | 'removed'; name: string; activity: Activity; tool: string }
+export type Member = { teamId: string; userId?: string; status?: 'active' | 'removed'; name: string; activity: Activity; tool: string; timeZone?: string; city?: string }
