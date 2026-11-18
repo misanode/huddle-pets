@@ -26,7 +26,7 @@ declare const __DEEPSPACE_SITE_ORIGIN__: string | undefined
 
 export const seo = {
   title: `${APP_NAME} | Live pets for your team's coding agents`,
-  description: 'Each teammate gets a pet that shows what their Claude Code agent is doing right now: reading, editing, running commands or waiting for you.',
+  description: 'Each teammate gets a pet that shows what their Claude Code or Codex agent is doing right now: reading, editing, running commands or waiting for you.',
   /** Public origin for canonical URLs, og:url, and the sitemap — no trailing
    *  slash. Replace with the custom domain once one is attached, e.g.
    *  'https://www.example.com'. */

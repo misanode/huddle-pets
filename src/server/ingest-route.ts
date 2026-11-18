@@ -13,7 +13,7 @@ export function registerIngestRoute(app: Hono<AppContext>): void {
     const key = c.req.header('Authorization')?.match(/^Bearer (\S+)$/)?.[1]
     if (!key || !HOOK_KEY_PATTERN.test(key)) return c.body(null, 401)
 
-    let body: { event?: unknown; tool?: unknown }
+    let body: { event?: unknown; tool?: unknown; status?: unknown; subagent?: unknown }
     try {
       body = JSON.parse(await readBoundedBodyText(c.req.raw, 1024)) ?? {}
     } catch (e) {
@@ -30,7 +30,8 @@ export function registerIngestRoute(app: Hono<AppContext>): void {
     const member = members.success ? members.data.records[0] : undefined
     if (!member || member.data.status === 'removed') return c.body(null, 401)
 
-    const next = activityFor(body.event, tool)
+    const status = typeof body.status === 'string' ? body.status : ''
+    const next = activityFor(body.event, tool, { status, subagent: body.subagent === true })
     if (next && (next.activity !== member.data.activity || next.tool !== member.data.tool)) {
       await tools.update<Member>('team_members', member.recordId, next)
     }
