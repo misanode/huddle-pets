@@ -1,23 +1,47 @@
 import type { Activity, Member } from '../schemas/team-members-schema'
-import { PetModel } from './PetModel'
+import { PetModel, usePetClip } from './PetModel'
 import { Button } from './ui'
 
-const looks: Record<Activity, { face: string; label: string }> = {
-  idle: { face: '😴', label: 'Idle' },
-  thinking: { face: '🤔', label: 'Thinking' },
-  reading: { face: '📖', label: 'Reading' },
-  searching: { face: '🔍', label: 'Searching' },
-  editing: { face: '✏️', label: 'Editing' },
-  command: { face: '⚙️', label: 'Running a command' },
-  waiting: { face: '✅', label: 'Waiting for you' },
-  permission: { face: '✋', label: 'Needs permission' },
-  error: { face: '💥', label: 'Hit an error' },
+const faces: Record<Activity, string> = {
+  idle: '😴',
+  thinking: '🤔',
+  reading: '📖',
+  searching: '🔍',
+  editing: '✏️',
+  command: '⚙️',
+  waiting: '✅',
+  permission: '✋',
+  error: '💥',
+}
+
+const phrases: Record<string, string> = {
+  idle: 'Just hanging out.',
+  happy: 'Life is good.',
+  excited: 'Ooh, let’s go!',
+  curious: 'What’s that?',
+  sad: 'A little blue today.',
+  coffee: 'Tiny coffee break.',
+  workout: 'One more rep!',
+  meditate: 'Finding my zen.',
+  idea: 'Oh! I’ve got it!',
+  dance: 'This is my song!',
+  wave: 'Hey, you!',
+  thinking: 'Hmm…',
+  reading: 'Taking a look.',
+  searching: 'Looking for clues.',
+  typing: 'Typing something…',
+  command: 'Running a command…',
+  permission: 'Can I do this?',
+  error: 'Oops. Hit a snag.',
+  done: 'All done!',
+  donehold: 'All done!',
 }
 
 type Props = { member: Pick<Member, 'name' | 'activity' | 'tool'>; updatedAt: string; isMe?: boolean; onRemove?: () => void }
 
 export function PetCard({ member, updatedAt, isMe = false, onRemove }: Props) {
-  const look = looks[member.activity] ?? looks.idle
+  const clip = usePetClip(member.activity)
+  const phrase = phrases[clip] ?? phrases.idle
 
   return (
     <li data-testid="pet-card" data-activity={member.activity} className="relative flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center">
@@ -27,11 +51,11 @@ export function PetCard({ member, updatedAt, isMe = false, onRemove }: Props) {
         </Button>
       )}
       <PetModel
-        activity={member.activity}
-        label={`${member.name}'s pet, ${look.label.toLowerCase()}`}
+        clip={clip}
+        label={`${member.name}'s pet: ${phrase}`}
         fallback={
           <span className="text-5xl" aria-hidden>
-            {look.face}
+            {faces[member.activity] ?? faces.idle}
           </span>
         }
       />
@@ -39,7 +63,9 @@ export function PetCard({ member, updatedAt, isMe = false, onRemove }: Props) {
         {member.name}
         {isMe && <span className="text-muted-foreground"> (you)</span>}
       </span>
-      <span className="text-sm">{look.label}</span>
+      <span data-testid="pet-phrase" className="text-sm">
+        {phrase}
+      </span>
       {member.tool && <span className="rounded bg-secondary px-2 py-0.5 font-mono text-xs">{member.tool}</span>}
       <time className="text-xs text-muted-foreground" dateTime={updatedAt}>
         {new Date(updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
