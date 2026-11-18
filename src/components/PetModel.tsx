@@ -107,7 +107,7 @@ export function PetModel({ clip: wanted, label, fallback }: { clip: string; labe
     }
   }, [enabled])
 
-  if (!enabled) return fallback
+  if (!enabled) return <div className="flex h-32 w-full items-center justify-center">{fallback}</div>
   const clip = !clips || clips.includes(wanted) ? wanted : 'idle'
 
   return (

@@ -38,6 +38,22 @@ const phrases: Record<string, string> = {
   donehold: 'All done!',
 }
 
+const toolLabels: Record<string, string> = {
+  Read: 'Reading…',
+  NotebookRead: 'Reading…',
+  Edit: 'Editing…',
+  MultiEdit: 'Editing…',
+  NotebookEdit: 'Editing…',
+  apply_patch: 'Editing…',
+  Write: 'Writing…',
+  Grep: 'Searching…',
+  Glob: 'Finding files…',
+  LS: 'Listing files…',
+  ToolSearch: 'Searching…',
+  WebSearch: 'Searching the web…',
+  WebFetch: 'Fetching…',
+}
+
 type CardAction = { label: string; ariaLabel: string; onClick: () => void }
 type Props = { member: Pick<Member, 'name' | 'activity' | 'tool' | 'timeZone' | 'city'>; updatedAt: string; isMe?: boolean; action?: CardAction }
 
@@ -63,26 +79,30 @@ export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
           </span>
         }
       />
-      <span className="font-medium">
+      <span className="w-full truncate font-medium">
         {member.name}
         {isMe && <span className="text-muted-foreground"> (you)</span>}
       </span>
-      <span data-testid="pet-phrase" className="text-sm">
+      <span data-testid="pet-phrase" className="w-full truncate text-sm">
         {phrase}
       </span>
-      {member.tool && <span className="rounded bg-secondary px-2 py-0.5 font-mono text-xs">{member.tool}</span>}
-      {clock ? (
-        <span data-testid="pet-clock" className="text-xs text-muted-foreground" title={`Last update ${updated} your time`}>
-          <span className="whitespace-nowrap">
+      <span className={`h-5 max-w-full truncate rounded px-2 font-mono text-xs leading-5 ${member.tool ? 'bg-secondary' : 'invisible'}`} aria-hidden={!member.tool}>
+        {member.tool ? (toolLabels[member.tool] ?? member.tool) : '·'}
+      </span>
+      <div className="mt-auto flex w-full flex-col items-center text-xs leading-4 text-muted-foreground" title={`Last update ${updated} your time`}>
+        {clock ? (
+          <span data-testid="pet-clock" className="whitespace-nowrap tabular-nums">
             <span aria-hidden>{clock.night ? '🌙' : '☀️'}</span> {clock.time}
           </span>
-          {member.city && <span className="whitespace-nowrap"> · {member.city}</span>}
+        ) : (
+          <time className="tabular-nums" dateTime={updatedAt}>
+            {updated}
+          </time>
+        )}
+        <span data-testid="pet-city" className="h-4 w-full truncate">
+          {member.city}
         </span>
-      ) : (
-        <time className="text-xs text-muted-foreground" dateTime={updatedAt}>
-          {updated}
-        </time>
-      )}
+      </div>
     </li>
   )
 }
