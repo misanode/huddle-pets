@@ -1,7 +1,8 @@
 import { useState, type SubmitEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useMutations, useQuery } from 'deepspace'
-import { Button, Input, useToast } from '@/components/ui'
+import { useAuth, useMutations, useQuery } from 'deepspace'
+import { Button, ConfirmModal, Input, useToast } from '@/components/ui'
+import { callAction } from '@/lib/actions'
 import { useMyProfile } from '@/lib/display-name'
 import { localTimeZone } from '@/lib/time-zone'
 import type { Room } from '../../../schemas/rooms-schema'
@@ -10,12 +11,25 @@ import type { Member } from '../../../schemas/team-members-schema'
 export default function HomePage() {
   const navigate = useNavigate()
   const mine = useMyProfile()
-  const { error } = useToast()
+  const { userId } = useAuth()
+  const { error, success } = useToast()
   const { records: rooms, status } = useQuery<Room>('rooms', { orderBy: 'createdAt', orderDir: 'desc' })
   const createRoom = useMutations<Room>('rooms')
   const createMember = useMutations<Member>('team_members')
   const [name, setName] = useState('')
   const [busy, setBusy] = useState(false)
+  const [deleting, setDeleting] = useState<{ teamId: string; name: string }>()
+  const [deletingBusy, setDeletingBusy] = useState(false)
+
+  const deleteRoom = async () => {
+    if (!deleting) return
+    setDeletingBusy(true)
+    const result = await callAction('deleteRoom', { teamId: deleting.teamId })
+    setDeletingBusy(false)
+    if (!result.success) return error(`Could not delete ${deleting.name}`, result.error)
+    success(`${deleting.name} was deleted`)
+    setDeleting(undefined)
+  }
 
   const submit = async (event: SubmitEvent) => {
     event.preventDefault()
@@ -45,11 +59,33 @@ export default function HomePage() {
           <p className="text-sm text-muted-foreground">No rooms yet. Create one, or open a room link from a teammate.</p>
         )}
         {rooms.map((room) => (
-          <Link key={room.recordId} to={`/r/${room.data.teamId}`} className="rounded-lg border border-border bg-card px-4 py-3 hover:bg-secondary">
-            {room.data.name}
-          </Link>
+          <div key={room.recordId} data-testid="room-row" className="flex items-center rounded-lg border border-border bg-card hover:bg-secondary">
+            <Link to={`/r/${room.data.teamId}`} className="min-w-0 flex-1 truncate px-4 py-3">
+              {room.data.name}
+            </Link>
+            {room.createdBy === userId && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mr-2 text-muted-foreground hover:text-destructive"
+                aria-label={`Delete ${room.data.name}`}
+                onClick={() => setDeleting({ teamId: room.data.teamId, name: room.data.name })}
+              >
+                Delete
+              </Button>
+            )}
+          </div>
         ))}
       </section>
+      <ConfirmModal
+        open={!!deleting}
+        onClose={() => setDeleting(undefined)}
+        onConfirm={deleteRoom}
+        loading={deletingBusy}
+        title={`Delete ${deleting?.name ?? ''}?`}
+        description="Everyone in it loses access, their agent hooks stop sending here, and the invite link stops working. This can't be undone."
+        confirmText="Delete room"
+      />
     </div>
   )
 }

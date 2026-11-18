@@ -68,9 +68,47 @@ test('the room owner removes a teammate, who loses access and cannot rejoin', as
   await guest.page.goto('/home')
   await expect(guest.page.getByRole('link', { name: roomName })).toHaveCount(0, { timeout: 15_000 })
   await guest.page.goto(link)
-  await guest.page.getByRole('button', { name: 'Join room' }).click()
-  await expect(guest.page.getByText('You were removed from this room')).toBeVisible({ timeout: 15_000 })
+  await expect(guest.page.getByRole('heading', { name: 'You were removed from this room' })).toBeVisible({ timeout: 15_000 })
+  await expect(guest.page.getByRole('button', { name: 'Join room' })).toHaveCount(0)
   await expect(guest.page.getByTestId('pet-card')).toHaveCount(0)
+})
+
+test('the room owner deletes a room, and its link stops working for everyone', async ({ users, request }) => {
+  const [owner, guest] = await users(2)
+  const roomName = `Delete ${Date.now()}`
+
+  await owner.page.goto('/home')
+  await owner.page.getByPlaceholder('Room name').fill(roomName)
+  await owner.page.getByRole('button', { name: 'New room' }).click()
+  await owner.page.waitForURL(/\/r\/[0-9a-f-]{36}$/)
+  const link = owner.page.url()
+
+  await guest.page.goto(link)
+  await guest.page.getByRole('button', { name: 'Join room' }).click()
+  await expect(guest.page.getByTestId('pet-card')).toHaveCount(2, { timeout: 15_000 })
+  await guest.page.getByRole('button', { name: 'Connect my agent' }).click()
+  const guestKey = (await guest.page.getByRole('dialog').textContent())?.match(/hp_[0-9a-f]{64}/)?.[0] ?? ''
+  await guest.page.keyboard.press('Escape')
+
+  await guest.page.goto('/home')
+  await expect(guest.page.getByRole('link', { name: roomName })).toBeVisible({ timeout: 15_000 })
+  await expect(guest.page.getByRole('button', { name: `Delete ${roomName}` })).toHaveCount(0)
+
+  await owner.page.goto('/home')
+  await owner.page.getByRole('button', { name: `Delete ${roomName}` }).click()
+  await owner.page.getByRole('dialog').getByRole('button', { name: 'Delete room' }).click()
+  await expect(owner.page.getByRole('link', { name: roomName })).toHaveCount(0, { timeout: 15_000 })
+
+  const ingest = await request.post('/api/ingest', { headers: { Authorization: `Bearer ${guestKey}`, 'Content-Type': 'application/json' }, data: '{"event":"Stop"}' })
+  expect(ingest.status()).toBe(401)
+
+  await guest.page.reload()
+  await expect(guest.page.getByRole('link', { name: roomName })).toHaveCount(0, { timeout: 15_000 })
+  for (const { page } of [owner, guest]) {
+    await page.goto(link)
+    await expect(page.getByRole('heading', { name: 'This room no longer exists' })).toBeVisible({ timeout: 15_000 })
+    await expect(page.getByRole('button', { name: 'Join room' })).toHaveCount(0)
+  }
 })
 
 test('renaming yourself updates your pet in every room, live for teammates', async ({ users }) => {
