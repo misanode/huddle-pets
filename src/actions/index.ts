@@ -40,4 +40,32 @@ export const actions: Record<string, ActionHandler<Env>> = {
     const keys = await tools.deleteWhere('hook_keys', { teamId, userId: member.userId })
     return keys.success ? { success: true, data: null } : keys
   },
+
+  async deleteRoom({ userId, params, tools }) {
+    const teamId = String(params.teamId ?? '')
+    const rooms = await tools.query<Room>('rooms', { where: { teamId }, limit: 1 })
+    if (!rooms.success) return rooms
+    const room = rooms.data.records[0]
+    if (!room) return { success: false, error: 'That room no longer exists.' }
+    if (room.createdBy !== userId) return { success: false, error: 'Only the room owner can delete it.' }
+
+    for (const collection of ['hook_keys', 'team_members']) {
+      for (;;) {
+        const drained = await tools.deleteWhere(collection, { teamId }, 500)
+        if (!drained.success) return drained
+        if (drained.data.deleted < 500) break
+      }
+    }
+    const removed = await tools.remove('rooms', room.recordId)
+    return removed.success ? { success: true, data: null } : removed
+  },
+
+  async roomStatus({ userId, params, tools }) {
+    const teamId = String(params.teamId ?? '')
+    const rooms = await tools.query<Room>('rooms', { where: { teamId }, limit: 1 })
+    if (!rooms.success) return rooms
+    const members = await tools.query<Member>('team_members', { where: { teamId, userId }, limit: 1 })
+    if (!members.success) return members
+    return { success: true, data: { exists: rooms.data.records.length > 0, removed: members.data.records[0]?.data.status === 'removed' } }
+  },
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useAuth, useMutations, useQuery } from 'deepspace'
-import { Button, ConfirmModal, Modal, useToast } from '@/components/ui'
+import { Button, ConfirmModal, Modal, buttonVariants, useToast } from '@/components/ui'
 import { ProfileForm } from '@/components/ProfileForm'
 import { callAction } from '@/lib/actions'
 import { useMyProfile } from '@/lib/display-name'
@@ -28,7 +28,37 @@ export default function RoomPage() {
   return records[0] ? <Room teamId={teamId} /> : <JoinRoom teamId={teamId} />
 }
 
+type RoomStatus = { exists: boolean; removed: boolean }
+
 function JoinRoom({ teamId }: { teamId: string }) {
+  const [status, setStatus] = useState<RoomStatus>()
+
+  useEffect(() => {
+    callAction<RoomStatus>('roomStatus', { teamId }).then(
+      (result) => setStatus(result.data ?? { exists: true, removed: false }),
+      () => setStatus({ exists: true, removed: false }),
+    )
+  }, [teamId])
+
+  if (!status) return null
+  if (!status.exists) return <RoomNotice title="This room no longer exists" body="The owner deleted it. Ask them for a new invite link." />
+  if (status.removed) return <RoomNotice title="You were removed from this room" body="Ask the room owner if you think this is a mistake." />
+  return <JoinPrompt teamId={teamId} />
+}
+
+function RoomNotice({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
+      <h1 className="text-lg font-semibold">{title}</h1>
+      <p className="max-w-sm text-sm text-muted-foreground">{body}</p>
+      <Link to="/home" className={buttonVariants({ variant: 'outline' })}>
+        Back to your rooms
+      </Link>
+    </div>
+  )
+}
+
+function JoinPrompt({ teamId }: { teamId: string }) {
   const mine = useMyProfile()
   const { ready, createConfirmed } = useMutations<Member>('team_members')
   const { error } = useToast()
