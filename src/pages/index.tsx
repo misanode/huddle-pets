@@ -22,7 +22,8 @@ import { APP_NAME } from '../constants'
 import { seo } from '../seo'
 
 const brandButton =
-  'rounded-2xl transition duration-150 hover:brightness-125 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+  'relative grid place-items-center rounded-2xl transition duration-150 hover:brightness-125 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&>*]:col-start-1 [&>*]:row-start-1'
+const brandLabel = 'select-none whitespace-nowrap pb-0.5 text-lg font-semibold text-white sm:text-[22px]'
 
 export default function Landing() {
   return (
@@ -32,7 +33,7 @@ export default function Landing() {
         data-testid="static-landing"
         className="flex min-h-screen flex-col items-center justify-center px-6 text-center"
       >
-        <img src="/brand/logo.svg" alt={APP_NAME} width={735} height={703} className="mb-2 h-auto w-36 sm:w-44" />
+        <img src="/brand/logo.png" alt={APP_NAME} width={540} height={516} className="mb-2 h-auto w-36 sm:w-44" />
         <h1 className="mb-4 max-w-2xl text-4xl font-semibold leading-[1.05] text-foreground sm:text-5xl">
           See what your team’s coding agents are doing
         </h1>
@@ -41,11 +42,13 @@ export default function Landing() {
           waiting for them.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Link to="/demo" aria-label="Watch the live demo" className={brandButton}>
-            <img src="/brand/watch-live-demo.svg" alt="" width={961} height={293} className="h-auto w-52 sm:w-64" />
+          <Link to="/demo" className={brandButton}>
+            <img src="/brand/watch-live-demo.png" alt="" width={780} height={230} className="h-16 w-auto sm:h-[76px]" />
+            <span className={brandLabel}>Watch the live demo</span>
           </Link>
-          <Link to="/home" aria-label="Create a room" className={brandButton}>
-            <img src="/brand/create-a-room.svg" alt="" width={776} height={271} className="h-auto w-[168px] sm:w-[207px]" />
+          <Link to="/home" className={brandButton}>
+            <img src="/brand/create-a-room.png" alt="" width={660} height={230} className="h-16 w-auto sm:h-[76px]" />
+            <span className={brandLabel}>Create a room</span>
           </Link>
         </div>
       </div>
