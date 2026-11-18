@@ -72,3 +72,36 @@ test('the room owner removes a teammate, who loses access and cannot rejoin', as
   await expect(guest.page.getByText('You were removed from this room')).toBeVisible({ timeout: 15_000 })
   await expect(guest.page.getByTestId('pet-card')).toHaveCount(0)
 })
+
+test('renaming yourself updates your pet in every room, live for teammates', async ({ users }) => {
+  const [a, b] = await users(2)
+  const link = async (name: string) => {
+    await a.page.goto('/home')
+    await a.page.getByPlaceholder('Room name').fill(name)
+    await a.page.getByRole('button', { name: 'New room' }).click()
+    await a.page.waitForURL(/\/r\/[0-9a-f-]{36}$/)
+    return a.page.url()
+  }
+  const first = await link(`Rename A ${Date.now()}`)
+  const second = await link(`Rename B ${Date.now()}`)
+
+  await b.page.goto(first)
+  await b.page.getByRole('button', { name: 'Join room' }).click()
+  await expect(b.page.getByTestId('pet-card')).toHaveCount(2, { timeout: 15_000 })
+
+  const newName = `Pixel ${Date.now() % 100000}`
+  await a.page.goto(first)
+  await a.page.getByRole('button', { name: 'Edit your display name' }).click()
+  await a.page.getByLabel('Display name').fill(newName)
+  await a.page.getByRole('dialog').getByRole('button', { name: 'Save' }).click()
+
+  await expect(a.page.getByTestId('pet-card').filter({ hasText: '(you)' })).toContainText(newName, { timeout: 15_000 })
+  await expect(b.page.getByTestId('pet-card').filter({ hasNotText: '(you)' })).toContainText(newName, { timeout: 15_000 })
+  await a.page.goto(second)
+  await expect(a.page.getByTestId('pet-card').filter({ hasText: '(you)' })).toContainText(newName, { timeout: 15_000 })
+
+  await a.page.goto('/settings')
+  await expect(a.page.getByLabel('Display name')).toHaveValue(newName, { timeout: 15_000 })
+  await expect(b.page.getByRole('button', { name: 'Edit your display name' })).toHaveCount(1)
+  await expect(b.page.getByRole('button', { name: /^Remove / })).toHaveCount(0)
+})
