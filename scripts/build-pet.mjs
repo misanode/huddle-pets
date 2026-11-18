@@ -7,7 +7,6 @@ if (!source) throw new Error('Usage: node scripts/build-pet.mjs <lilagent.glb> [
 
 const FACE_FOR_CLIP = {
   idle: 'prompt',
-  waiting: 'prompt',
   typing: 'prompt',
   command: 'prompt',
   thinking: 'closed',
@@ -15,6 +14,26 @@ const FACE_FOR_CLIP = {
   searching: 'eyes',
   permission: 'wide',
   error: 'sad',
+  done: 'happy',
+  donehold: 'happy',
+  curious: 'eyes',
+  happy: 'happy',
+  dance: 'happy',
+  excited: 'happy',
+  sad: 'sad',
+  wave: 'happy',
+  workout: 'squint',
+  meditate: 'closed',
+  idea: [
+    [0, 'wide'],
+    [1.2, 'happy'],
+  ],
+  coffee: [
+    [0, 'eyes'],
+    [29 / 24, 'asleep'],
+    [55 / 24, 'happy'],
+    [79 / 24, 'eyes'],
+  ],
 }
 const CURSOR_BLINK_SECONDS = 1.06
 
@@ -53,7 +72,9 @@ const track = (anim, node, times, visible) => {
 for (const anim of clips) {
   const face = FACE_FOR_CLIP[anim.getName()]
   const duration = Math.max(...anim.listSamplers().map((s) => s.getInput().getMax([])[0]))
-  for (const [name, node] of faces) if (name !== 'cursor') track(anim, node, [0], [name === face])
+  const steps = typeof face === 'string' ? [[0, face]] : face
+  const times = steps.map(([t]) => t)
+  for (const [name, node] of faces) if (name !== 'cursor') track(anim, node, times, steps.map(([, f]) => f === name))
   const cursor = faces.get('cursor')
   if (!cursor) continue
   if (face !== 'prompt') track(anim, cursor, [0], [false])
