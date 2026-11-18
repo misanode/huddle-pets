@@ -6,6 +6,7 @@
 import { signOut, useUser } from 'deepspace'
 import { Button } from '@/components/ui'
 import { ProfileForm } from '@/components/ProfileForm'
+import { PageHeader } from '@/components/PageHeader'
 
 export default function SettingsPage() {
   const { user } = useUser()
@@ -15,11 +16,11 @@ export default function SettingsPage() {
     // (app)/_layout provides (a plain background, or a raised panel), so they
     // stay transparent and inherit it.
     <div className="min-h-full text-foreground">
-      <div className="mx-auto max-w-2xl px-6 py-20">
-        <h1 className="mb-12 text-4xl font-bold tracking-tight">Settings</h1>
+      <div className="mx-auto flex max-w-xl flex-col gap-8 px-4 py-12">
+        <PageHeader title="Settings" subtitle="How you show up in your rooms." />
 
-        <section className="rounded-lg border border-border bg-card p-6">
-          <h2 className="mb-4 text-lg font-semibold">Your account</h2>
+        <section className="surface rounded-3xl p-6">
+          <h2 className="mb-5 text-xl font-semibold">Your account</h2>
 
           <div className="mb-6">
             <ProfileForm />
@@ -36,7 +37,7 @@ export default function SettingsPage() {
             </div>
           </dl>
 
-          <Button variant="secondary" className="mt-6" onClick={() => signOut()}>
+          <Button variant="outline" className="mt-6" onClick={() => signOut()}>
             Sign out
           </Button>
         </section>

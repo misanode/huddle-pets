@@ -64,7 +64,7 @@ export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
   const updated = new Date(updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
   return (
-    <li data-testid="pet-card" data-activity={member.activity} className="relative flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center">
+    <li data-testid="pet-card" data-activity={member.activity} className="surface relative flex flex-col items-center gap-2 rounded-3xl p-5 text-center">
       {action && (
         <Button variant="ghost" size="sm" onClick={action.onClick} aria-label={action.ariaLabel} className="absolute right-2 top-2 z-10 text-muted-foreground">
           {action.label}
@@ -79,14 +79,14 @@ export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
           </span>
         }
       />
-      <span className="w-full truncate font-medium">
+      <span className="w-full truncate text-base font-semibold">
         {member.name}
         {isMe && <span className="text-muted-foreground"> (you)</span>}
       </span>
       <span data-testid="pet-phrase" className="w-full truncate text-sm">
         {phrase}
       </span>
-      <span className={`h-5 max-w-full truncate rounded px-2 font-mono text-xs leading-5 ${member.tool ? 'bg-secondary' : 'invisible'}`} aria-hidden={!member.tool}>
+      <span className={`h-5 max-w-full truncate rounded-md px-2 text-xs font-medium leading-5 ${member.tool ? 'bg-white/[0.06] ring-1 ring-inset ring-white/10' : 'invisible'}`} aria-hidden={!member.tool}>
         {member.tool ? (toolLabels[member.tool] ?? member.tool) : '·'}
       </span>
       <div className="mt-auto flex w-full flex-col items-center text-xs leading-4 text-muted-foreground" title={`Last update ${updated} your time`}>

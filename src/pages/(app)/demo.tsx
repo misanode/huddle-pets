@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useQuery } from 'deepspace'
 import { buttonVariants } from '@/components/ui'
 import { PetCard } from '../../components/PetCard'
+import { PageHeader } from '../../components/PageHeader'
 import type { DemoPet } from '../../schemas/demo-pets-schema'
 
 const DEMO_PLACES: Record<string, { timeZone: string; city?: string }> = {
@@ -25,18 +26,12 @@ export default function DemoPage() {
   }, [])
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Demo room</h1>
-          <p className="text-sm text-muted-foreground">
-            Four simulated teammates. Everyone watching this page sees the same pets change, live.
-          </p>
-        </div>
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12">
+      <PageHeader title="Demo room" subtitle="Four simulated teammates. Everyone watching this page sees the same pets change, live.">
         <Link to="/home" className={buttonVariants()}>
-          Make your own room
+          Create a room
         </Link>
-      </header>
+      </PageHeader>
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
         {records.map((pet) => (
           <PetCard key={pet.recordId} member={{ ...pet.data, ...DEMO_PLACES[pet.data.name] }} updatedAt={pet.updatedAt} />

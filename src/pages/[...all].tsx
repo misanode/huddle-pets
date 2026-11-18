@@ -1,19 +1,18 @@
 import { Link } from 'react-router-dom'
 import { APP_NAME } from '../constants'
+import { Hero } from '../components/Hero'
+import { buttonVariants } from '../components/ui'
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center text-center px-4">
+    <div className="min-h-screen">
       <title>{`Not found · ${APP_NAME}`}</title>
       <meta name="robots" content="noindex" />
-      <h1 className="text-4xl font-bold text-foreground mb-2">404</h1>
-      <p className="text-muted-foreground mb-6">Page not found</p>
-      <Link
-        to="/home"
-        className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
-      >
-        Go home
-      </Link>
+      <Hero title="404" body="We couldn’t find that page.">
+        <Link to="/" className={buttonVariants({ size: 'lg' })}>
+          Go home
+        </Link>
+      </Hero>
     </div>
   )
 }
