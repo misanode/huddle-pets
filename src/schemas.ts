@@ -14,9 +14,11 @@ import { roomsSchema } from './schemas/rooms-schema'
 import { teamMembersSchema } from './schemas/team-members-schema'
 import { hookKeysSchema } from './schemas/hook-keys-schema'
 import { demoPetsSchema } from './schemas/demo-pets-schema'
+import { profilesSchema } from './schemas/profiles-schema'
 
 export const schemas: CollectionSchema[] = [
   usersSchema,
+  profilesSchema,
   settingsSchema,
   roomsSchema,
   teamMembersSchema,

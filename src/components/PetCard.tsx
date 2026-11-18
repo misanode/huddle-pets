@@ -37,17 +37,18 @@ const phrases: Record<string, string> = {
   donehold: 'All done!',
 }
 
-type Props = { member: Pick<Member, 'name' | 'activity' | 'tool'>; updatedAt: string; isMe?: boolean; onRemove?: () => void }
+type CardAction = { label: string; ariaLabel: string; onClick: () => void }
+type Props = { member: Pick<Member, 'name' | 'activity' | 'tool'>; updatedAt: string; isMe?: boolean; action?: CardAction }
 
-export function PetCard({ member, updatedAt, isMe = false, onRemove }: Props) {
+export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
   const clip = usePetClip(member.activity)
   const phrase = phrases[clip] ?? phrases.idle
 
   return (
     <li data-testid="pet-card" data-activity={member.activity} className="relative flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center">
-      {onRemove && (
-        <Button variant="ghost" size="sm" onClick={onRemove} aria-label={`Remove ${member.name}`} className="absolute right-2 top-2 z-10 text-muted-foreground">
-          Remove
+      {action && (
+        <Button variant="ghost" size="sm" onClick={action.onClick} aria-label={action.ariaLabel} className="absolute right-2 top-2 z-10 text-muted-foreground">
+          {action.label}
         </Button>
       )}
       <PetModel

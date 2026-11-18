@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useAuth, useDisplayName, useMutations, useQuery } from 'deepspace'
-import { Button, ConfirmModal, useToast } from '@/components/ui'
+import { useAuth, useMutations, useQuery } from 'deepspace'
+import { Button, ConfirmModal, Modal, useToast } from '@/components/ui'
+import { DisplayNameForm } from '@/components/DisplayNameForm'
 import { callAction } from '@/lib/actions'
+import { useMyName } from '@/lib/display-name'
 import type { Room } from '../../../../schemas/rooms-schema'
 import { ACTIVITIES, type Member } from '../../../../schemas/team-members-schema'
 import { PetCard } from '../../../../components/PetCard'
@@ -26,7 +28,7 @@ export default function RoomPage() {
 }
 
 function JoinRoom({ teamId }: { teamId: string }) {
-  const displayName = useDisplayName()
+  const myName = useMyName()
   const { ready, createConfirmed } = useMutations<Member>('team_members')
   const { error } = useToast()
   const [busy, setBusy] = useState(false)
@@ -34,7 +36,7 @@ function JoinRoom({ teamId }: { teamId: string }) {
   const join = async () => {
     setBusy(true)
     try {
-      await createConfirmed({ teamId, name: (displayName ?? 'Teammate').slice(0, 40), activity: 'idle', tool: '' })
+      await createConfirmed({ teamId, name: myName, activity: 'idle', tool: '' })
     } catch (e) {
       const message = e instanceof Error ? e.message : ''
       if (message.startsWith('Duplicate')) error('You were removed from this room', 'Ask the room owner if you think this is a mistake.')
@@ -61,6 +63,7 @@ function Room({ teamId }: { teamId: string }) {
   const { ready, put } = useMutations<Member>('team_members')
   const { success, error } = useToast()
   const [removing, setRemoving] = useState<{ id: string; name: string }>()
+  const [renaming, setRenaming] = useState(false)
   const [busy, setBusy] = useState(false)
   const members = records.filter((m) => m.data.status !== 'removed')
   const me = members.find((m) => m.data.userId === userId)
@@ -103,16 +106,22 @@ function Room({ teamId }: { teamId: string }) {
         </div>
       </header>
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
-        {members.map((m) => (
-          <PetCard
-            key={m.recordId}
-            member={m.data}
-            updatedAt={m.updatedAt}
-            isMe={m.data.userId === userId}
-            onRemove={isOwner && m.data.userId !== userId ? () => setRemoving({ id: m.recordId, name: m.data.name }) : undefined}
-          />
-        ))}
+        {members.map((m) => {
+          const isMe = m.data.userId === userId
+          const action = isMe
+            ? { label: 'Edit name', ariaLabel: 'Edit your display name', onClick: () => setRenaming(true) }
+            : isOwner
+              ? { label: 'Remove', ariaLabel: `Remove ${m.data.name}`, onClick: () => setRemoving({ id: m.recordId, name: m.data.name }) }
+              : undefined
+          return <PetCard key={m.recordId} member={m.data} updatedAt={m.updatedAt} isMe={isMe} action={action} />
+        })}
       </ul>
+      <Modal open={renaming} onClose={() => setRenaming(false)} size="sm">
+        <Modal.Title>Edit your display name</Modal.Title>
+        <div className="mt-4">
+          <DisplayNameForm onSaved={() => setRenaming(false)} />
+        </div>
+      </Modal>
       <ConfirmModal
         open={!!removing}
         onClose={() => setRemoving(undefined)}

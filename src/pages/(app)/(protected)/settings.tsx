@@ -5,6 +5,7 @@
 
 import { signOut, useUser } from 'deepspace'
 import { Button } from '@/components/ui'
+import { DisplayNameForm } from '@/components/DisplayNameForm'
 
 export default function SettingsPage() {
   const { user } = useUser()
@@ -20,9 +21,13 @@ export default function SettingsPage() {
         <section className="rounded-lg border border-border bg-card p-6">
           <h2 className="mb-4 text-lg font-semibold">Your account</h2>
 
+          <div className="mb-6">
+            <DisplayNameForm />
+          </div>
+
           <dl className="space-y-3 text-sm">
             <div>
-              <dt className="text-muted-foreground">Name</dt>
+              <dt className="text-muted-foreground">Account name</dt>
               <dd className="text-foreground">{user?.name ?? '—'}</dd>
             </div>
             <div>
