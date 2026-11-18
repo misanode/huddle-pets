@@ -35,3 +35,40 @@ test('a teammate joins by link and both see the same pet update live', async ({ 
   await b.page.reload()
   await expect(aCardOnB).toHaveAttribute('data-activity', activity ?? '', { timeout: 15_000 })
 })
+
+test('the room owner removes a teammate, who loses access and cannot rejoin', async ({ users, request }) => {
+  const [owner, guest] = await users(2)
+  const roomName = `Kick ${Date.now()}`
+
+  await owner.page.goto('/home')
+  await owner.page.getByPlaceholder('Room name').fill(roomName)
+  await owner.page.getByRole('button', { name: 'New room' }).click()
+  await owner.page.waitForURL(/\/r\/[0-9a-f-]{36}$/)
+  const link = owner.page.url()
+
+  await guest.page.goto(link)
+  await guest.page.getByRole('button', { name: 'Join room' }).click()
+  await expect(guest.page.getByTestId('pet-card')).toHaveCount(2, { timeout: 15_000 })
+  await expect(guest.page.getByRole('button', { name: /^Remove / })).toHaveCount(0)
+
+  await guest.page.getByRole('button', { name: 'Connect my agent' }).click()
+  const guestKey = (await guest.page.getByRole('dialog').textContent())?.match(/hp_[0-9a-f]{64}/)?.[0] ?? ''
+  await guest.page.keyboard.press('Escape')
+  const ingest = (key: string) => request.post('/api/ingest', { headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' }, data: '{"event":"Stop"}' })
+  expect((await ingest(guestKey)).status()).toBe(204)
+
+  await expect(owner.page.getByTestId('pet-card')).toHaveCount(2, { timeout: 15_000 })
+  await expect(owner.page.getByRole('button', { name: /^Remove / })).toHaveCount(1)
+  await owner.page.getByRole('button', { name: /^Remove / }).click()
+  await owner.page.getByRole('dialog').getByRole('button', { name: 'Remove' }).click()
+  await expect(owner.page.getByTestId('pet-card')).toHaveCount(1, { timeout: 15_000 })
+
+  expect((await ingest(guestKey)).status()).toBe(401)
+
+  await guest.page.goto('/home')
+  await expect(guest.page.getByRole('link', { name: roomName })).toHaveCount(0, { timeout: 15_000 })
+  await guest.page.goto(link)
+  await guest.page.getByRole('button', { name: 'Join room' }).click()
+  await expect(guest.page.getByText('You were removed from this room')).toBeVisible({ timeout: 15_000 })
+  await expect(guest.page.getByTestId('pet-card')).toHaveCount(0)
+})

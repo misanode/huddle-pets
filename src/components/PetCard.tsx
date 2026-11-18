@@ -1,5 +1,6 @@
 import type { Activity, Member } from '../schemas/team-members-schema'
 import { PetModel } from './PetModel'
+import { Button } from './ui'
 
 const looks: Record<Activity, { face: string; label: string }> = {
   idle: { face: '😴', label: 'Idle' },
@@ -13,11 +14,18 @@ const looks: Record<Activity, { face: string; label: string }> = {
   error: { face: '💥', label: 'Hit an error' },
 }
 
-export function PetCard({ member, updatedAt, isMe = false }: { member: Pick<Member, 'name' | 'activity' | 'tool'>; updatedAt: string; isMe?: boolean }) {
+type Props = { member: Pick<Member, 'name' | 'activity' | 'tool'>; updatedAt: string; isMe?: boolean; onRemove?: () => void }
+
+export function PetCard({ member, updatedAt, isMe = false, onRemove }: Props) {
   const look = looks[member.activity] ?? looks.idle
 
   return (
-    <li data-testid="pet-card" data-activity={member.activity} className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center">
+    <li data-testid="pet-card" data-activity={member.activity} className="relative flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center">
+      {onRemove && (
+        <Button variant="ghost" size="sm" onClick={onRemove} aria-label={`Remove ${member.name}`} className="absolute right-2 top-2 z-10 text-muted-foreground">
+          Remove
+        </Button>
+      )}
       <PetModel
         activity={member.activity}
         label={`${member.name}'s pet, ${look.label.toLowerCase()}`}

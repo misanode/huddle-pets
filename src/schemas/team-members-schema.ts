@@ -27,4 +27,4 @@ export const teamMembersSchema: CollectionSchema = {
   permissions: { member: access, admin: access },
 }
 
-export type Member = { teamId: string; userId?: string; name: string; activity: Activity; tool: string }
+export type Member = { teamId: string; userId?: string; status?: 'active' | 'removed'; name: string; activity: Activity; tool: string }

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { getAuthToken } from 'deepspace'
 import { Button, Modal, useToast } from '@/components/ui'
+import { callAction } from '@/lib/actions'
 
 export function ConnectAgent({ teamId }: { teamId: string }) {
   const [key, setKey] = useState<string>()
@@ -9,12 +9,7 @@ export function ConnectAgent({ teamId }: { teamId: string }) {
 
   const createKey = async () => {
     setBusy(true)
-    const res = await fetch('/api/actions/createHookKey', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await getAuthToken()}` },
-      body: JSON.stringify({ teamId }),
-    })
-    const result: { success: boolean; data?: { key: string }; error?: string } = await res.json()
+    const result = await callAction<{ key: string }>('createHookKey', { teamId })
     setBusy(false)
     if (result.data) setKey(result.data.key)
     else error('Could not create a hook key', result.error)

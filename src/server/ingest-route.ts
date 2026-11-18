@@ -28,7 +28,7 @@ export function registerIngestRoute(app: Hono<AppContext>): void {
     if (!owner) return c.body(null, 401)
     const members = await tools.query<Member>('team_members', { where: { teamId: owner.teamId, userId: owner.userId }, limit: 1 })
     const member = members.success ? members.data.records[0] : undefined
-    if (!member) return c.body(null, 401)
+    if (!member || member.data.status === 'removed') return c.body(null, 401)
 
     const next = activityFor(body.event, tool)
     if (next && (next.activity !== member.data.activity || next.tool !== member.data.tool)) {

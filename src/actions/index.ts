@@ -1,13 +1,16 @@
 import type { ActionHandler } from 'deepspace/worker'
 import type { Env } from '../../worker'
 import { hashHookKey, newHookKey, type HookKey } from '../server/hook-keys'
+import type { Room } from '../schemas/rooms-schema'
+import type { Member } from '../schemas/team-members-schema'
 
 export const actions: Record<string, ActionHandler<Env>> = {
   async createHookKey({ userId, params, tools }) {
     const where = { teamId: String(params.teamId ?? ''), userId }
-    const member = await tools.query('team_members', { where, limit: 1 })
+    const member = await tools.query<Member>('team_members', { where, limit: 1 })
     if (!member.success) return member
-    if (!member.data.records.length) return { success: false, error: 'Join the room first.' }
+    const record = member.data.records[0]
+    if (!record || record.data.status === 'removed') return { success: false, error: 'Join the room first.' }
 
     const key = newHookKey()
     const keyHash = await hashHookKey(key)
@@ -18,5 +21,23 @@ export const actions: Record<string, ActionHandler<Env>> = {
       ? await tools.update<HookKey>('hook_keys', current.recordId, { keyHash })
       : await tools.create<HookKey>('hook_keys', { ...where, keyHash })
     return saved.success ? { success: true, data: { key } } : saved
+  },
+
+  async removeMember({ userId, params, tools }) {
+    const teamId = String(params.teamId ?? '')
+    const rooms = await tools.query<Room>('rooms', { where: { teamId }, limit: 1 })
+    if (!rooms.success) return rooms
+    if (rooms.data.records[0]?.createdBy !== userId) return { success: false, error: 'Only the room owner can remove people.' }
+
+    const found = await tools.get<Member>('team_members', String(params.memberId ?? ''))
+    if (!found.success) return found
+    const member = found.data.record.data
+    if (member.teamId !== teamId || !member.userId) return { success: false, error: 'That person is not in this room.' }
+    if (member.userId === userId) return { success: false, error: "You can't remove yourself." }
+
+    const removed = await tools.update<Member>('team_members', found.data.record.recordId, { status: 'removed', activity: 'idle', tool: '' })
+    if (!removed.success) return removed
+    const keys = await tools.deleteWhere('hook_keys', { teamId, userId: member.userId })
+    return keys.success ? { success: true, data: null } : keys
   },
 }

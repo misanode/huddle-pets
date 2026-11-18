@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAuth, useDisplayName, useMutations, useQuery } from 'deepspace'
-import { Button, useToast } from '@/components/ui'
+import { Button, ConfirmModal, useToast } from '@/components/ui'
+import { callAction } from '@/lib/actions'
 import type { Room } from '../../../../schemas/rooms-schema'
 import { ACTIVITIES, type Member } from '../../../../schemas/team-members-schema'
 import { PetCard } from '../../../../components/PetCard'
@@ -35,7 +36,9 @@ function JoinRoom({ teamId }: { teamId: string }) {
     try {
       await createConfirmed({ teamId, name: (displayName ?? 'Teammate').slice(0, 40), activity: 'idle', tool: '' })
     } catch (e) {
-      error('Could not join the room', e instanceof Error ? e.message : undefined)
+      const message = e instanceof Error ? e.message : ''
+      if (message.startsWith('Duplicate')) error('You were removed from this room', 'Ask the room owner if you think this is a mistake.')
+      else error('Could not join the room', message || undefined)
       setBusy(false)
     }
   }
@@ -54,10 +57,24 @@ function JoinRoom({ teamId }: { teamId: string }) {
 function Room({ teamId }: { teamId: string }) {
   const { userId } = useAuth()
   const { records: rooms } = useQuery<Room>('rooms', { where: { teamId } })
-  const { records: members } = useQuery<Member>('team_members', { where: { teamId }, orderBy: 'createdAt' })
+  const { records } = useQuery<Member>('team_members', { where: { teamId }, orderBy: 'createdAt' })
   const { ready, put } = useMutations<Member>('team_members')
-  const { success } = useToast()
+  const { success, error } = useToast()
+  const [removing, setRemoving] = useState<{ id: string; name: string }>()
+  const [busy, setBusy] = useState(false)
+  const members = records.filter((m) => m.data.status !== 'removed')
   const me = members.find((m) => m.data.userId === userId)
+  const isOwner = !!userId && rooms[0]?.createdBy === userId
+
+  const remove = async () => {
+    if (!removing) return
+    setBusy(true)
+    const result = await callAction('removeMember', { teamId, memberId: removing.id })
+    setBusy(false)
+    if (!result.success) return error(`Could not remove ${removing.name}`, result.error)
+    success(`${removing.name} was removed`)
+    setRemoving(undefined)
+  }
 
   const simulate = () => {
     if (!me) return
@@ -87,9 +104,24 @@ function Room({ teamId }: { teamId: string }) {
       </header>
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
         {members.map((m) => (
-          <PetCard key={m.recordId} member={m.data} updatedAt={m.updatedAt} isMe={m.data.userId === userId} />
+          <PetCard
+            key={m.recordId}
+            member={m.data}
+            updatedAt={m.updatedAt}
+            isMe={m.data.userId === userId}
+            onRemove={isOwner && m.data.userId !== userId ? () => setRemoving({ id: m.recordId, name: m.data.name }) : undefined}
+          />
         ))}
       </ul>
+      <ConfirmModal
+        open={!!removing}
+        onClose={() => setRemoving(undefined)}
+        onConfirm={remove}
+        loading={busy}
+        title={`Remove ${removing?.name ?? ''}?`}
+        description="Their pet leaves the room, their agent hook stops working here, and they can't rejoin from the invite link."
+        confirmText="Remove"
+      />
     </div>
   )
 }
