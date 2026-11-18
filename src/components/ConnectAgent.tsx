@@ -31,7 +31,7 @@ export function ConnectAgent({ teamId }: { teamId: string }) {
         Connect my agent
       </Button>
       <Modal open={!!key} onClose={() => setKey(undefined)} size="lg">
-        <Modal.Title>Connect Claude Code to your pet</Modal.Title>
+        <Modal.Title>Connect Claude Code or Codex to your pet</Modal.Title>
         <Modal.Description>Your personal hook key is inside the commands below. It's shown only once, so finish these steps now.</Modal.Description>
         <ol className="mt-4 flex list-decimal flex-col gap-4 pl-5 text-sm marker:font-semibold">
           <li>
@@ -51,17 +51,21 @@ export function ConnectAgent({ teamId }: { teamId: string }) {
               </div>
             ))}
             <span className="text-muted-foreground">
-              You should see <code>huddle-pets hook installed</code>.
+              You should see <code>huddle-pets hook installed</code> followed by the agents it found: Claude Code, Codex, or both.
             </span>
           </li>
-          <li>Quit Claude Code completely and open it again.</li>
-          <li>Use Claude Code as usual. Your pet on this page now shows what your agent is doing.</li>
+          <li>Quit your agent completely and open it again.</li>
+          <li>In Codex, you'll be told the new hooks need review. Open the hooks list and trust the huddle-pets hooks, or they won't run.</li>
+          <li>Use your agent as usual. Your pet on this page now shows what it's doing.</li>
         </ol>
         <div className="mt-5 flex flex-col gap-1 border-t border-border pt-4 text-xs text-muted-foreground">
           <p>Only the event name and tool name are sent, never your files, commands or prompts.</p>
           <p>Keep the key private: anyone with it can change your pet. Clicking "Connect my agent" again makes a new key and turns this one off.</p>
           <p>
-            To remove the hook: <code>node ~/.huddle-pets/hook.mjs uninstall</code>
+            Installed the other agent later? Run <code>node ~/.huddle-pets/hook.mjs install</code> to connect it with the same key.
+          </p>
+          <p>
+            To remove the hook from both agents: <code>node ~/.huddle-pets/hook.mjs uninstall</code>
           </p>
         </div>
       </Modal>

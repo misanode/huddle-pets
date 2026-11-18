@@ -34,7 +34,7 @@ export default function Landing() {
           See what your team's coding agents are doing
         </h1>
         <p className="mb-8 max-w-md text-muted-foreground">
-          Each teammate gets a pet that reacts live to their Claude Code session: reading, editing, running commands, or
+          Each teammate gets a pet that reacts live to their Claude Code or Codex session: reading, editing, running commands, or
           waiting for them.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
