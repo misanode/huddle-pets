@@ -23,6 +23,9 @@ test('signed-out visitors watch the demo pets change live', async ({ page, brows
           els.every((el) => {
             const clip = el.querySelector('model-viewer')?.getAttribute('data-clip') ?? ''
             const activity = el.getAttribute('data-activity')
+            const phrases: Record<string, string> = { idle: 'Just hanging out.', done: 'All done!', donehold: 'All done!', typing: 'Typing something…', thinking: 'Hmm…', coffee: 'Tiny coffee break.' }
+            const phrase = el.querySelector('[data-testid="pet-phrase"]')?.textContent
+            if (phrases[clip] && phrase !== phrases[clip]) return false
             if (activity === 'idle') return ['idle', 'curious', 'happy', 'dance', 'excited', 'sad', 'wave', 'coffee', 'workout', 'meditate', 'idea'].includes(clip)
             if (activity === 'waiting') return ['done', 'donehold'].includes(clip)
             return clip === (activity === 'editing' ? 'typing' : activity)

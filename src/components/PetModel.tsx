@@ -74,15 +74,21 @@ function useRestingClip(activity: Activity, animate: boolean) {
   return clip
 }
 
+const prefersReducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches
+
+export function usePetClip(activity: Activity) {
+  const resting = useRestingClip(activity, !prefersReducedMotion())
+  return activity === 'idle' || activity === 'waiting' ? resting : (CLIP_FOR[activity] ?? activity)
+}
+
 let modelViewer: Promise<unknown> | undefined
 const loadModelViewer = () => (modelViewer ??= import('@google/model-viewer'))
 
-export function PetModel({ activity, label, fallback }: { activity: Activity; label: string; fallback: ReactNode }) {
+export function PetModel({ clip: wanted, label, fallback }: { clip: string; label: string; fallback: ReactNode }) {
   const ref = useRef<ModelViewerElement>(null)
   const [enabled, setEnabled] = useState(false)
   const [clips, setClips] = useState<string[]>()
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
-  const resting = useRestingClip(activity, !reducedMotion)
+  const reducedMotion = prefersReducedMotion()
 
   useEffect(() => {
     loadModelViewer().then(() => setEnabled(true), () => {})
@@ -102,7 +108,6 @@ export function PetModel({ activity, label, fallback }: { activity: Activity; la
   }, [enabled])
 
   if (!enabled) return fallback
-  const wanted = activity === 'idle' || activity === 'waiting' ? resting : (CLIP_FOR[activity] ?? activity)
   const clip = !clips || clips.includes(wanted) ? wanted : 'idle'
 
   return (
