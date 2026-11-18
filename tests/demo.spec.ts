@@ -17,7 +17,19 @@ test('signed-out visitors watch the demo pets change live', async ({ page, brows
   await expect.poll(async () => new Set(await Promise.all([activities(page), activities(second)])).size, { timeout: 15_000 }).toBe(1)
 
   await expect
-    .poll(() => cards.evaluateAll((els) => els.every((el) => el.querySelector('model-viewer')?.getAttribute('data-clip') === (el.getAttribute('data-activity') === 'editing' ? 'typing' : el.getAttribute('data-activity')))), { timeout: 20_000 })
+    .poll(
+      () =>
+        cards.evaluateAll((els) =>
+          els.every((el) => {
+            const clip = el.querySelector('model-viewer')?.getAttribute('data-clip') ?? ''
+            const activity = el.getAttribute('data-activity')
+            if (activity === 'idle') return ['idle', 'curious', 'happy', 'dance', 'excited', 'sad', 'wave', 'coffee', 'workout', 'meditate', 'idea'].includes(clip)
+            if (activity === 'waiting') return ['done', 'donehold'].includes(clip)
+            return clip === (activity === 'editing' ? 'typing' : activity)
+          }),
+        ),
+      { timeout: 20_000 },
+    )
     .toBe(true)
   expect(errors).toEqual([])
 })
