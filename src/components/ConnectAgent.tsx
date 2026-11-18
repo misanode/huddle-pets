@@ -27,7 +27,7 @@ export function ConnectAgent({ teamId }: { teamId: string }) {
 
   return (
     <>
-      <Button variant="outline" onClick={createKey} loading={busy}>
+      <Button onClick={createKey} loading={busy}>
         Connect my agent
       </Button>
       <Modal open={!!key} onClose={() => setKey(undefined)} size="lg">

@@ -17,26 +17,26 @@
  * they stay consistent across every preset.
  */
 @theme {
-  /* shadcn core tokens — slate (default): neutral gray on near-black, indigo accent */
-  --color-background: #0a0a0a;
-  --color-foreground: #e8eaed;
-  --color-card: #161616;
-  --color-card-foreground: #e8eaed;
-  --color-popover: #161616;
-  --color-popover-foreground: #e8eaed;
-  --color-primary: #818cf8;
-  --color-primary-foreground: #ffffff;
-  --color-secondary: #1e1e1e;
-  --color-secondary-foreground: #e8eaed;
-  --color-muted: #1e1e1e;
-  --color-muted-foreground: #9ca3af;
-  --color-accent: #262626;
-  --color-accent-foreground: #e8eaed;
+  /* shadcn core tokens — slate (default): huddle-pets monochrome, matches the landing page */
+  --color-background: #0b0b0b;
+  --color-foreground: #f2f2f2;
+  --color-card: #131313;
+  --color-card-foreground: #f2f2f2;
+  --color-popover: #141414;
+  --color-popover-foreground: #f2f2f2;
+  --color-primary: #f2f2f2;
+  --color-primary-foreground: #0b0b0b;
+  --color-secondary: #1a1a1a;
+  --color-secondary-foreground: #f2f2f2;
+  --color-muted: #1a1a1a;
+  --color-muted-foreground: #a1a1aa;
+  --color-accent: #1f1f1f;
+  --color-accent-foreground: #f2f2f2;
   --color-destructive: #ef4444;
   --color-destructive-foreground: #ffffff;
-  --color-border: rgba(60, 64, 67, 0.6);
-  --color-input: rgba(60, 64, 67, 0.6);
-  --color-ring: #818cf8;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-input: rgba(255, 255, 255, 0.14);
+  --color-ring: #a1a1aa;
   --radius: 0.5rem;
 
   /*
@@ -88,8 +88,8 @@
      simply doesn't reference them. In every theme keep the panel reading as
      elevated: dark → panel lighter than shell; light → white panel on a
      faintly darker shell. */
-  --color-shell: #0a0a0a;
-  --color-shell-panel: #161616;
+  --color-shell: #0b0b0b;
+  --color-shell-panel: #131313;
 
   /* Animations */
   --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
@@ -137,6 +137,34 @@
 @utility fade-out-0 { --tw-exit-opacity: 0; }
 @utility zoom-in-95 { --tw-enter-scale: .95; }
 @utility zoom-out-95 { --tw-exit-scale: .95; }
+@utility glossy {
+  color: #fff;
+  background: linear-gradient(160deg, #6a6a6a 0%, #2b2b2b 28%, #050505 55%, #1d1d1d 80%, #3d3d3d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.35),
+    inset 1px 0 0 rgba(255, 255, 255, 0.18),
+    inset -1px 0 0 rgba(255, 255, 255, 0.28),
+    0 6px 16px -6px rgba(0, 0, 0, 0.8);
+}
+
+@utility glossy-dark {
+  color: #fff;
+  background: #000;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 6px 16px -6px rgba(0, 0, 0, 0.8);
+}
+
+@utility surface {
+  background: linear-gradient(180deg, #171717 0%, #0f0f0f 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 12px 32px -16px rgba(0, 0, 0, 0.8);
+}
+
 @utility slide-in-from-top-2 { --tw-enter-translate-y: -0.5rem; }
 @utility slide-in-from-bottom-2 { --tw-enter-translate-y: 0.5rem; }
 @utility slide-in-from-left-2 { --tw-enter-translate-x: -0.5rem; }

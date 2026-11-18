@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth, useMutations, useQuery } from 'deepspace'
 import { Button, ConfirmModal, Input, useToast } from '@/components/ui'
 import { callAction } from '@/lib/actions'
+import { PageHeader } from '@/components/PageHeader'
 import { useMyProfile } from '@/lib/display-name'
 import { localTimeZone } from '@/lib/time-zone'
 import type { Room } from '../../../schemas/rooms-schema'
@@ -46,21 +47,21 @@ export default function HomePage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-8 px-4 py-10">
-      <form onSubmit={submit} className="flex gap-2">
+    <div className="mx-auto flex max-w-xl flex-col gap-8 px-4 py-12">
+      <PageHeader title="Your rooms" subtitle="Each room shows your teammates' pets, live." />
+      <form onSubmit={submit} className="surface flex gap-2 rounded-2xl p-2">
         <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Room name" required />
         <Button type="submit" loading={busy} disabled={!createRoom.ready || !name.trim()}>
           New room
         </Button>
       </form>
-      <section className="flex flex-col gap-2">
-        <h2 className="text-sm font-medium text-muted-foreground">Your rooms</h2>
+      <section className="flex flex-col gap-2.5">
         {status === 'ready' && rooms.length === 0 && (
-          <p className="text-sm text-muted-foreground">No rooms yet. Create one, or open a room link from a teammate.</p>
+          <p className="text-center text-sm font-light text-muted-foreground">No rooms yet. Create one, or open a room link from a teammate.</p>
         )}
         {rooms.map((room) => (
-          <div key={room.recordId} data-testid="room-row" className="flex items-center rounded-lg border border-border bg-card hover:bg-secondary">
-            <Link to={`/r/${room.data.teamId}`} className="min-w-0 flex-1 truncate px-4 py-3">
+          <div key={room.recordId} data-testid="room-row" className="surface flex items-center rounded-2xl transition hover:brightness-125">
+            <Link to={`/r/${room.data.teamId}`} className="min-w-0 flex-1 truncate px-5 py-4 text-base font-medium">
               {room.data.name}
             </Link>
             {room.createdBy === userId && (

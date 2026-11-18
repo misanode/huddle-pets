@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuth, useMutations, useQuery } from 'deepspace'
 import { Button, ConfirmModal, Modal, buttonVariants, useToast } from '@/components/ui'
 import { ProfileForm } from '@/components/ProfileForm'
+import { Hero } from '@/components/Hero'
+import { PageHeader } from '@/components/PageHeader'
 import { callAction } from '@/lib/actions'
 import { useMyProfile } from '@/lib/display-name'
 import { localTimeZone } from '@/lib/time-zone'
@@ -48,13 +50,11 @@ function JoinRoom({ teamId }: { teamId: string }) {
 
 function RoomNotice({ title, body }: { title: string; body: string }) {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-      <h1 className="text-lg font-semibold">{title}</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">{body}</p>
-      <Link to="/home" className={buttonVariants({ variant: 'outline' })}>
+    <Hero title={title} body={body}>
+      <Link to="/home" className={buttonVariants({ variant: 'outline', size: 'lg' })}>
         Back to your rooms
       </Link>
-    </div>
+    </Hero>
   )
 }
 
@@ -77,13 +77,11 @@ function JoinPrompt({ teamId }: { teamId: string }) {
   }
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-center">
-      <h1 className="text-lg font-semibold">You've been invited to a room</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">Your pet will show your coding agent's activity to everyone in it.</p>
-      <Button onClick={join} loading={busy} disabled={!ready}>
+    <Hero title="You’ve been invited to a room" body="Your pet will show your coding agent’s activity to everyone in it.">
+      <Button size="lg" onClick={join} loading={busy} disabled={!ready}>
         Join room
       </Button>
-    </div>
+    </Hero>
   )
 }
 
@@ -130,19 +128,16 @@ function Room({ teamId }: { teamId: string }) {
   }
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">{rooms[0]?.data.name ?? 'Room'}</h1>
-        <div className="flex flex-wrap gap-2">
-          <ConnectAgent teamId={teamId} />
-          <Button variant="outline" onClick={copyLink}>
-            Copy invite link
-          </Button>
-          <Button onClick={simulate} disabled={!ready || !me}>
-            Simulate activity
-          </Button>
-        </div>
-      </header>
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12">
+      <PageHeader title={rooms[0]?.data.name ?? 'Room'} subtitle={`${members.length} ${members.length === 1 ? 'pet' : 'pets'} in this room`}>
+        <ConnectAgent teamId={teamId} />
+        <Button variant="outline" onClick={copyLink}>
+          Copy invite link
+        </Button>
+        <Button variant="outline" onClick={simulate} disabled={!ready || !me}>
+          Simulate activity
+        </Button>
+      </PageHeader>
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
         {members.map((m) => {
           const isMe = m.data.userId === userId

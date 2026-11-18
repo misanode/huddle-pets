@@ -58,8 +58,8 @@ export default function Navigation() {
         to={item.path}
         aria-current={active ? 'page' : undefined}
         className={cn(
-          'px-3 py-1.5 text-sm',
-          active ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+          'rounded-lg px-3 py-1.5 text-sm transition-colors',
+          active ? 'bg-white/[0.07] font-medium text-foreground' : 'text-muted-foreground hover:text-foreground',
         )}
       >
         {item.label}
@@ -69,9 +69,10 @@ export default function Navigation() {
 
   return (
     <>
-      <nav data-testid="app-navigation" className="border-b border-border bg-background">
-        <div className="mx-auto flex h-12 max-w-7xl items-center gap-4 px-4">
-          <Link to="/" className="text-sm font-semibold text-foreground">
+      <nav data-testid="app-navigation" className="border-b border-border bg-background/80 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
+          <Link to="/" className="flex items-center gap-2 text-base font-semibold text-foreground">
+            <img src="/brand/logo.png" alt="" width={540} height={516} className="h-8 w-auto" />
             {APP_NAME}
           </Link>
 
@@ -136,7 +137,7 @@ export default function Navigation() {
             <button
               data-testid="nav-sign-in-button"
               onClick={() => setShowAuthModal(true)}
-              className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:opacity-90"
+              className="glossy rounded-xl px-4 py-1.5 text-sm font-semibold transition hover:brightness-125 active:scale-[0.97]"
             >
               Sign in
             </button>
