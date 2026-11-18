@@ -4,6 +4,7 @@ import { useQuery } from 'deepspace'
 import { buttonVariants } from '@/components/ui'
 import { PetCard } from '../../components/PetCard'
 import { PageHeader } from '../../components/PageHeader'
+import { PetGrid } from '../../components/PetGrid'
 import type { DemoPet } from '../../schemas/demo-pets-schema'
 
 const DEMO_PLACES: Record<string, { timeZone: string; city?: string }> = {
@@ -26,17 +27,17 @@ export default function DemoPage() {
   }, [])
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12">
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-6 sm:py-12">
       <PageHeader title="Demo room" subtitle="Four simulated teammates. Everyone watching this page sees the same pets change, live.">
         <Link to="/home" className={buttonVariants()}>
           Create a room
         </Link>
       </PageHeader>
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
+      <PetGrid>
         {records.map((pet) => (
           <PetCard key={pet.recordId} member={{ ...pet.data, ...DEMO_PLACES[pet.data.name] }} updatedAt={pet.updatedAt} />
         ))}
-      </ul>
+      </PetGrid>
     </div>
   )
 }

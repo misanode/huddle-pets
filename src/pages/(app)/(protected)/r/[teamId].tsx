@@ -5,6 +5,7 @@ import { Button, ConfirmModal, Modal, buttonVariants, useToast } from '@/compone
 import { ProfileForm } from '@/components/ProfileForm'
 import { Hero } from '@/components/Hero'
 import { PageHeader } from '@/components/PageHeader'
+import { PetGrid } from '@/components/PetGrid'
 import { callAction } from '@/lib/actions'
 import { useMyProfile } from '@/lib/display-name'
 import { localTimeZone } from '@/lib/time-zone'
@@ -128,17 +129,21 @@ function Room({ teamId }: { teamId: string }) {
   }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-12">
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-6 sm:py-12">
       <PageHeader title={rooms[0]?.data.name ?? 'Room'} subtitle={`${members.length} ${members.length === 1 ? 'pet' : 'pets'} in this room`}>
-        <ConnectAgent teamId={teamId} />
+        <div className="hidden sm:contents">
+          <ConnectAgent teamId={teamId} />
+        </div>
         <Button variant="outline" onClick={copyLink}>
           Copy invite link
         </Button>
-        <Button variant="outline" onClick={simulate} disabled={!ready || !me}>
-          Simulate activity
-        </Button>
+        <div className="hidden sm:contents">
+          <Button variant="outline" onClick={simulate} disabled={!ready || !me}>
+            Simulate activity
+          </Button>
+        </div>
       </PageHeader>
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
+      <PetGrid>
         {members.map((m) => {
           const isMe = m.data.userId === userId
           const action = isMe
@@ -148,7 +153,7 @@ function Room({ teamId }: { teamId: string }) {
               : undefined
           return <PetCard key={m.recordId} member={m.data} updatedAt={m.updatedAt} isMe={isMe} action={action} />
         })}
-      </ul>
+      </PetGrid>
       <Modal open={renaming} onClose={() => setRenaming(false)} size="sm">
         <Modal.Title>Edit your profile</Modal.Title>
         <div className="mt-4">

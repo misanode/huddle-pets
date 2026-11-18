@@ -16,7 +16,7 @@ export default function SettingsPage() {
     // (app)/_layout provides (a plain background, or a raised panel), so they
     // stay transparent and inherit it.
     <div className="min-h-full text-foreground">
-      <div className="mx-auto flex max-w-xl flex-col gap-8 px-4 py-12">
+      <div className="mx-auto flex max-w-xl flex-col gap-8 px-4 py-6 sm:py-12">
         <PageHeader title="Settings" subtitle="How you show up in your rooms." />
 
         <section className="surface rounded-3xl p-6">

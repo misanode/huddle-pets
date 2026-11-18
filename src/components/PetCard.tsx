@@ -64,9 +64,9 @@ export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
   const updated = new Date(updatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
   return (
-    <li data-testid="pet-card" data-activity={member.activity} className="surface relative flex flex-col items-center gap-2 rounded-3xl p-5 text-center">
+    <li data-testid="pet-card" data-activity={member.activity} className="surface relative flex min-w-0 flex-col items-center gap-1.5 rounded-3xl p-3 text-center sm:gap-2 sm:p-5">
       {action && (
-        <Button variant="ghost" size="sm" onClick={action.onClick} aria-label={action.ariaLabel} className="absolute right-2 top-2 z-10 text-muted-foreground">
+        <Button variant="ghost" size="sm" onClick={action.onClick} aria-label={action.ariaLabel} className="absolute right-1 top-1 z-10 h-8 px-2 text-muted-foreground sm:right-2 sm:top-2 sm:h-9 sm:px-3">
           {action.label}
         </Button>
       )}
@@ -79,7 +79,7 @@ export function PetCard({ member, updatedAt, isMe = false, action }: Props) {
           </span>
         }
       />
-      <span className="w-full truncate text-base font-semibold">
+      <span className="w-full truncate text-sm font-semibold sm:text-base">
         {member.name}
         {isMe && <span className="text-muted-foreground"> (you)</span>}
       </span>
