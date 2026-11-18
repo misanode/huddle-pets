@@ -1,4 +1,5 @@
 import type { Activity, Member } from '../schemas/team-members-schema'
+import { PetModel } from './PetModel'
 
 const looks: Record<Activity, { face: string; label: string }> = {
   idle: { face: '😴', label: 'Idle' },
@@ -17,9 +18,15 @@ export function PetCard({ member, updatedAt, isMe = false }: { member: Pick<Memb
 
   return (
     <li data-testid="pet-card" data-activity={member.activity} className="flex flex-col items-center gap-2 rounded-xl border border-border bg-card p-5 text-center">
-      <span className="text-5xl" aria-hidden>
-        {look.face}
-      </span>
+      <PetModel
+        activity={member.activity}
+        label={`${member.name}'s pet, ${look.label.toLowerCase()}`}
+        fallback={
+          <span className="text-5xl" aria-hidden>
+            {look.face}
+          </span>
+        }
+      />
       <span className="font-medium">
         {member.name}
         {isMe && <span className="text-muted-foreground"> (you)</span>}
