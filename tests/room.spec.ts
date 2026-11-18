@@ -147,3 +147,34 @@ test('renaming yourself updates your pet in every room, live for teammates', asy
   await expect(b.page.getByRole('button', { name: 'Edit your name and city' })).toHaveCount(1)
   await expect(b.page.getByRole('button', { name: /^Remove / })).toHaveCount(0)
 })
+
+test('searching your rooms filters by name and never shows rooms you are not in', async ({ users }) => {
+  const [a, b] = await users(2)
+  const stamp = Date.now()
+  const create = async (name: string) => {
+    await a.page.goto('/home')
+    await a.page.getByPlaceholder('Room name').fill(name)
+    await a.page.getByRole('button', { name: 'New room' }).click()
+    await a.page.waitForURL(/\/r\/[0-9a-f-]{36}$/)
+  }
+  await create(`Café Crew ${stamp}`)
+  await create(`Design Desk ${stamp}`)
+
+  await a.page.goto('/home')
+  const search = a.page.getByRole('searchbox', { name: 'Search your rooms' })
+  await search.fill(`cafe crew ${stamp}`)
+  await expect(a.page.getByRole('link', { name: `Café Crew ${stamp}` })).toBeVisible({ timeout: 15_000 })
+  await expect(a.page.getByRole('link', { name: `Design Desk ${stamp}` })).toHaveCount(0)
+  await search.fill(`nothing ${stamp}`)
+  await expect(a.page.getByText(`No rooms match “nothing ${stamp}”.`)).toBeVisible()
+  await a.page.getByRole('button', { name: 'Clear search' }).click()
+  await expect(a.page.getByRole('link', { name: `Design Desk ${stamp}` })).toBeVisible()
+
+  await b.page.goto('/home')
+  await expect(b.page.getByRole('link', { name: `Café Crew ${stamp}` })).toHaveCount(0, { timeout: 15_000 })
+  const bSearch = b.page.getByRole('searchbox', { name: 'Search your rooms' })
+  if (await bSearch.count()) {
+    await bSearch.fill(`${stamp}`)
+    await expect(b.page.getByRole('link', { name: new RegExp(`${stamp}`) })).toHaveCount(0)
+  }
+})
