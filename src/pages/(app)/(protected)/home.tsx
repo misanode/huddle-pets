@@ -2,13 +2,14 @@ import { useState, type SubmitEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutations, useQuery } from 'deepspace'
 import { Button, Input, useToast } from '@/components/ui'
-import { useMyName } from '@/lib/display-name'
+import { useMyProfile } from '@/lib/display-name'
+import { localTimeZone } from '@/lib/time-zone'
 import type { Room } from '../../../schemas/rooms-schema'
 import type { Member } from '../../../schemas/team-members-schema'
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const myName = useMyName()
+  const mine = useMyProfile()
   const { error } = useToast()
   const { records: rooms, status } = useQuery<Room>('rooms', { orderBy: 'createdAt', orderDir: 'desc' })
   const createRoom = useMutations<Room>('rooms')
@@ -22,7 +23,7 @@ export default function HomePage() {
     const teamId = crypto.randomUUID()
     try {
       await createRoom.createConfirmed({ teamId, name: name.trim() })
-      await createMember.createConfirmed({ teamId, name: myName, activity: 'idle', tool: '' })
+      await createMember.createConfirmed({ teamId, name: mine.name, city: mine.city, activity: 'idle', tool: '', timeZone: localTimeZone() })
       navigate(`/r/${teamId}`)
     } catch (e) {
       error('Could not create the room', e instanceof Error ? e.message : undefined)

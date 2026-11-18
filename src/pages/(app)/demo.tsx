@@ -5,6 +5,13 @@ import { buttonVariants } from '@/components/ui'
 import { PetCard } from '../../components/PetCard'
 import type { DemoPet } from '../../schemas/demo-pets-schema'
 
+const DEMO_PLACES: Record<string, { timeZone: string; city?: string }> = {
+  Ana: { timeZone: 'America/Sao_Paulo', city: 'São Paulo' },
+  Ben: { timeZone: 'Europe/London' },
+  Chen: { timeZone: 'Asia/Shanghai' },
+  Dee: { timeZone: 'America/Los_Angeles', city: 'San Francisco' },
+}
+
 export default function DemoPage() {
   const { records } = useQuery<DemoPet>('demo_pets', { orderBy: 'name' })
 
@@ -32,7 +39,7 @@ export default function DemoPage() {
       </header>
       <ul className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
         {records.map((pet) => (
-          <PetCard key={pet.recordId} member={pet.data} updatedAt={pet.updatedAt} />
+          <PetCard key={pet.recordId} member={{ ...pet.data, ...DEMO_PLACES[pet.data.name] }} updatedAt={pet.updatedAt} />
         ))}
       </ul>
     </div>

@@ -91,17 +91,20 @@ test('renaming yourself updates your pet in every room, live for teammates', asy
 
   const newName = `Pixel ${Date.now() % 100000}`
   await a.page.goto(first)
-  await a.page.getByRole('button', { name: 'Edit your display name' }).click()
+  await a.page.getByRole('button', { name: 'Edit your name and city' }).click()
   await a.page.getByLabel('Display name').fill(newName)
+  await a.page.getByLabel('City (optional)').fill('Austin')
   await a.page.getByRole('dialog').getByRole('button', { name: 'Save' }).click()
 
   await expect(a.page.getByTestId('pet-card').filter({ hasText: '(you)' })).toContainText(newName, { timeout: 15_000 })
-  await expect(b.page.getByTestId('pet-card').filter({ hasNotText: '(you)' })).toContainText(newName, { timeout: 15_000 })
+  const aOnB = b.page.getByTestId('pet-card').filter({ hasNotText: '(you)' })
+  await expect(aOnB).toContainText(newName, { timeout: 15_000 })
+  await expect(aOnB.getByTestId('pet-clock')).toHaveText(/(AM|PM) \S+ · Austin$/)
   await a.page.goto(second)
   await expect(a.page.getByTestId('pet-card').filter({ hasText: '(you)' })).toContainText(newName, { timeout: 15_000 })
 
   await a.page.goto('/settings')
   await expect(a.page.getByLabel('Display name')).toHaveValue(newName, { timeout: 15_000 })
-  await expect(b.page.getByRole('button', { name: 'Edit your display name' })).toHaveCount(1)
+  await expect(b.page.getByRole('button', { name: 'Edit your name and city' })).toHaveCount(1)
   await expect(b.page.getByRole('button', { name: /^Remove / })).toHaveCount(0)
 })
