@@ -104,7 +104,7 @@ The script keeps the 20 animations the app uses and adds the right face to each 
 
 Everything visual in this app is my own original work:
 
-- **The 3D pet** is Lil Agent, a character I made for my Lil Agent desktop app, along with all its animations.
+- **The 3D pet** is Lil Agent, a character I designed for my Lil Agent desktop app. I built it in Blender, and made its animations with Claude through the Blender MCP.
 - **The logo, the landing page buttons and the pet icon** are my own designs. The original files (SVG and full-size PNG) are in `huddle-pets-branding/`, and the smaller copies the site actually uses are in `public/brand/`.
 
 The only outside asset is the [Kanit](https://fonts.google.com/specimen/Kanit) font, which is free to use from Google Fonts. All the code was written for this project.
