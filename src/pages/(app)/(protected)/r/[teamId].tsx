@@ -13,6 +13,7 @@ import type { Room } from '../../../../schemas/rooms-schema'
 import { ACTIVITIES, type Member } from '../../../../schemas/team-members-schema'
 import { PetCard } from '../../../../components/PetCard'
 import { ConnectAgent } from '../../../../components/ConnectAgent'
+import { InviteByEmail } from '../../../../components/InviteByEmail'
 
 const sampleTools: Partial<Record<Member['activity'], string>> = {
   reading: 'Read',
@@ -134,6 +135,7 @@ function Room({ teamId }: { teamId: string }) {
         <div className="hidden sm:contents">
           <ConnectAgent teamId={teamId} />
         </div>
+        <InviteByEmail teamId={teamId} />
         <Button variant="outline" onClick={copyLink}>
           Copy invite link
         </Button>

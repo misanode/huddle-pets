@@ -15,4 +15,9 @@ test.describe('API tests', () => {
     await page.waitForSelector('[data-testid="app-navigation"]', { timeout: 15000 })
     // If the app loaded and connected, the WS endpoint works
   })
+
+  test('signed-out callers cannot send email invites', async ({ request }) => {
+    const res = await request.post('/api/actions/inviteByEmail', { data: { teamId: 'x', email: 'someone@example.com' } })
+    expect(res.status()).toBe(401)
+  })
 })

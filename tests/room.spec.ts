@@ -178,3 +178,17 @@ test('searching your rooms filters by name and never shows rooms you are not in'
     await expect(b.page.getByRole('link', { name: new RegExp(`${stamp}`) })).toHaveCount(0)
   }
 })
+
+test('an email invite with a bad address is refused before anything is sent', async ({ users }) => {
+  const [owner] = await users(1)
+  await owner.page.goto('/home')
+  await owner.page.getByPlaceholder('Room name').fill(`Invite ${Date.now()}`)
+  await owner.page.getByRole('button', { name: 'New room' }).click()
+  await owner.page.waitForURL(/\/r\/[0-9a-f-]{36}$/)
+
+  await owner.page.getByRole('button', { name: 'Invite by email' }).click()
+  await owner.page.getByLabel('Their email').fill('not-an-email@nowhere')
+  await owner.page.getByRole('dialog').getByRole('button', { name: 'Send invite' }).click()
+  await expect(owner.page.getByText('That doesn’t look like an email address.')).toBeVisible({ timeout: 15_000 })
+  await expect(owner.page.getByRole('dialog')).toBeVisible()
+})
