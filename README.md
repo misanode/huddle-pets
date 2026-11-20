@@ -53,7 +53,7 @@ your agent ──hook──▶ hook.mjs ──{event, tool} + your key──▶ 
 | A public demo | Read-only `demo_pets` collection | Anyone can watch, only the server can change it |
 | Cap request size | `readBoundedBodyText` | DeepSpace's own size-limited body reader |
 
-**Things I built myself, and why:**
+**Custom parts (things DeepSpace doesn't do out of the box), and why:**
 - **The hook and `/api/ingest`.** A hook script can't sign in like a browser does, and DeepSpace's own agent tokens need a DeepSpace account.
 - **Hook keys.** Each person gets their own key, and the server only keeps a hash of it.
 - **Joining by link.** DeepSpace doesn't have a built-in "join by code" feature.
