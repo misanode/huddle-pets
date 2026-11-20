@@ -22,7 +22,7 @@ To remove it later, run `node ~/.huddle-pets/hook.mjs uninstall` on a Mac, or `n
 - **A short line under each pet** saying what it's up to ("Taking a look.", "All done!"), plus a tag for the tool ("Reading…", "Editing…", "Bash").
 - **Everyone's local time.** Each card shows the person's time and time zone, with a sun or moon, and an optional city. Handy when your team is spread across time zones.
 - **Your own display name and city,** which you can change from your card or from Settings.
-- **Room controls.** Rooms are invite-only. The person who made a room can remove people or delete the room. You can search the rooms you're already in.
+- **Room controls.** Rooms are invite-only. You can copy the invite link or send it by email. The person who made a room can remove people or delete the room. You can search the rooms you're already in.
 - **Works on your phone.** Handy if you're away from your desk and just want to check what everyone's doing.
 
 ## How it works
@@ -52,6 +52,7 @@ your agent ──hook──▶ hook.mjs ──{event, tool} + your key──▶ 
 | Make a hook key, remove someone, delete a room | Server actions | They run on the server, check that you're allowed, then do the work |
 | A public demo | Read-only `demo_pets` collection | Anyone can watch, only the server can change it |
 | Cap request size | `readBoundedBodyText` | DeepSpace's own size-limited body reader |
+| Invite a teammate by email | The `email` integration (`email/send`), called from a server action | Sends the room link without me running a mail server or holding an email API key |
 
 **Custom parts (things DeepSpace doesn't do out of the box), and why:**
 - **The hook and `/api/ingest`.** A hook script can't sign in like a browser does, and DeepSpace's own agent tokens need a DeepSpace account.
@@ -64,7 +65,10 @@ your agent ──hook──▶ hook.mjs ──{event, tool} + your key──▶ 
 - **An AI daily summary of each room.** I planned it, but it costs money per room and doesn't help with the main thing, which is seeing what everyone's doing right now.
 - **A "who's watching" list.** The pets already show who's active.
 - **Searching for other people's rooms.** It would let strangers see names, local times and what people's agents are doing. You can only search rooms you're already in.
+- **Weather for each teammate's city.** It would fit next to the local time, but it's a nice extra, not why anyone opens the app, and it costs money per lookup.
 - **Messaging, file uploads, live documents and payments.** They wouldn't add anything to this app.
+
+I only used one outside integration, email, because it's the only one that made the main thing easier: getting your teammates into the room.
 
 ## Privacy and security
 
@@ -72,6 +76,7 @@ your agent ──hook──▶ hook.mjs ──{event, tool} + your key──▶ 
 - **Hook keys are long random strings, and you only see yours once.** The server only stores a *hash* of each key (a one-way fingerprint), in a table no user can read. Making a new key turns the old one off.
 - **Room links use a random ID,** so nobody can guess them.
 - **Removing someone or deleting a room also deletes their hook keys** for that room, so their agent stops sending updates there.
+- **Email invites can't be abused easily.** Only people in the room can send them, the server builds the link itself (so nobody can slip in a different link), names are escaped in the email, and each person can send up to 10 a day. The app doesn't store the address you invited.
 - **There are no secrets in this repo.** The app doesn't need any API keys.
 
 ## Tradeoffs and what's missing
